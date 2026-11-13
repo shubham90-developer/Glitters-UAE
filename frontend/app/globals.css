@@ -1,0 +1,313 @@
+@import url("https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:ital,wght@0,100..900;1,100..900&family=Archivo:ital,wght@0,100..900;1,100..900&family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dosis:wght@200..800&family=Figtree:ital,wght@0,300..900;1,300..900&family=Geist:wght@100..900&family=Jura:wght@300..700&family=Noto+Sans+Devanagari:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&family=Sen:wght@400..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
+
+@import "tailwindcss";
+
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+/* Tailwind V4 Dark Mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===========================================
+   LIGHT THEME
+=========================================== */
+
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+
+  --header-bg: #ffffff;
+  --top-header-bg: #f7f7f7;
+
+  --card-bg: #ffffff;
+  --section-bg: #f8f8f8;
+
+  --text-primary: #111111;
+  --text-secondary: #666666;
+  --text-muted: #909090;
+
+  --border-color: #e5e5e5;
+
+  --input-bg: #ffffff;
+
+  --primary: #111111;
+  --primary-foreground: #ffffff;
+
+  --hover-bg: #f3f3f3;
+
+  color-scheme: light;
+}
+
+/* ===========================================
+   DARK THEME
+=========================================== */
+
+.dark {
+  --background: #0d0d0d;
+  --foreground: #f5f5f5;
+
+  --header-bg: #111111;
+  --top-header-bg: #181818;
+
+  --card-bg: #161616;
+  --section-bg: #121212;
+
+  --text-primary: #ffffff;
+  --text-secondary: #b5b5b5;
+  --text-muted: #7e7e7e;
+
+  --border-color: #2c2c2c;
+
+  --input-bg: #181818;
+
+  --primary: #ffffff;
+  --primary-foreground: #111111;
+
+  --hover-bg: #202020;
+
+  color-scheme: dark;
+}
+
+/* ===========================================
+   GLOBAL
+=========================================== */
+
+html {
+  background: var(--background);
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Jura", sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.theme-bg {
+  background-color: var(--background);
+}
+
+.theme-section {
+  background-color: var(--section-bg);
+}
+
+.theme-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.theme-text {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-border {
+  border-color: var(--border-color);
+}
+
+.theme-input {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.container {
+  width: 95%;
+  margin: auto;
+}
+
+.swiper-button-prev svg,
+.swiper-button-next svg {
+  width: 14px !important;
+  height: 14px !important;
+  color: #111827 !important;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  width: 28px !important;
+  height: 28px !important;
+  background: #fff8f8 !important;
+  border-radius: 9999px;
+}
+/* ===========================================
+   THEME BUTTON
+=========================================== */
+
+.th-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 170px;
+
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  text-decoration: none;
+
+  transition: all 0.35s ease;
+}
+
+.th-btn span {
+  position: relative;
+  z-index: 5;
+}
+
+/* LEFT & RIGHT DIAMONDS */
+
+.th-btn::before,
+.th-btn::after {
+  content: "";
+  position: absolute;
+
+  width: 22px;
+  height: 22px;
+
+  background: #000;
+
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+
+  z-index: -1;
+}
+
+.th-btn::before {
+  left: -27px;
+}
+
+.th-btn::after {
+  right: -27px;
+}
+
+/* Hover */
+
+.th-btn:hover {
+  color: #fff;
+}
+
+.th-btn:hover::before {
+  animation: criss-cross-left 0.75s forwards;
+}
+
+.th-btn:hover::after {
+  animation: criss-cross-right 0.75s forwards;
+}
+
+/* LEFT */
+
+@keyframes criss-cross-left {
+  0% {
+    left: -25px;
+    width: 22px;
+    height: 22px;
+  }
+
+  50% {
+    left: 50%;
+    width: 22px;
+    height: 22px;
+  }
+
+  100% {
+    left: 50%;
+    width: 420px;
+    height: 420px;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+}
+
+/* RIGHT */
+
+@keyframes criss-cross-right {
+  0% {
+    right: -25px;
+    width: 22px;
+    height: 22px;
+  }
+
+  50% {
+    right: 50%;
+    width: 22px;
+    height: 22px;
+  }
+
+  100% {
+    right: 50%;
+    width: 420px;
+    height: 420px;
+    transform: translate(50%, -50%) rotate(45deg);
+  }
+}
+
+@keyframes criss-cross-right {
+  0% {
+    right: -20px;
+  }
+  50% {
+    right: 50%;
+    width: 20px;
+    height: 20px;
+  }
+  100% {
+    right: 50%;
+    width: 450px;
+    height: 450px;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+.title-font {
+  font-family: var(--main-head-font) !important;
+}
+
+/* globals.css */
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.home-banner-slider .slick-slide > div {
+  line-height: 0;
+}
+
+.home-banner-slider .slick-track {
+  display: flex;
+}
+
+.home-banner-slider .slick-slide {
+  height: auto;
+}
