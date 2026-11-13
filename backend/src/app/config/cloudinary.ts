@@ -61,6 +61,28 @@ const getFileExtension = (fileName: string): string => {
 };
 
 // =====================================================
+// WORD DETECTION
+// Some browsers/OS combinations send .doc/.docx files as
+// application/octet-stream, so we also check the extension.
+// =====================================================
+
+const WORD_MIME_TYPES = [
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
+const WORD_EXTENSIONS = ["doc", "docx"];
+
+const isWordFile = (file: Express.Multer.File): boolean => {
+  if (WORD_MIME_TYPES.includes(file.mimetype)) return true;
+
+  return (
+    file.mimetype === "application/octet-stream" &&
+    WORD_EXTENSIONS.includes(getFileExtension(file.originalname))
+  );
+};
+
+// =====================================================
 // STORAGE
 // =====================================================
 
@@ -72,6 +94,7 @@ const storage = new CloudinaryStorage({
 
     const isVideo = file.mimetype.startsWith("video/");
     const isPdf = file.mimetype === "application/pdf";
+    const isWord = isWordFile(file);
     const isImage = file.mimetype.startsWith("image/");
 
     const fileName = sanitizeFileName(file.originalname);
@@ -86,6 +109,16 @@ const storage = new CloudinaryStorage({
         resource_type: "raw",
         type: "upload",
         public_id: `${publicId}.${extension || "pdf"}`,
+      } as any;
+    }
+
+    // WORD (.doc / .docx)
+    if (isWord) {
+      return {
+        folder,
+        resource_type: "raw",
+        type: "upload",
+        public_id: `${publicId}.${extension || "docx"}`,
       } as any;
     }
 
@@ -157,12 +190,17 @@ export const upload = multer({
 
       // PDF
       "application/pdf",
+
+      // Word
+      ...WORD_MIME_TYPES,
     ];
 
-    if (!allowedTypes.includes(file.mimetype)) {
+    const isAllowed = allowedTypes.includes(file.mimetype) || isWordFile(file);
+
+    if (!isAllowed) {
       return cb(
         new Error(
-          `Invalid file type: ${file.mimetype}. Only image, video and PDF files are allowed.`,
+          `Invalid file type: ${file.mimetype}. Only image, video, PDF and Word (.doc, .docx) files are allowed.`,
         ),
       );
     }

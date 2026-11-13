@@ -85,10 +85,14 @@ const validateForm = (f: IAddressBody): string | null => {
 
   // UAE mobile: +971 5X XXX XXXX (9 digits after the country code)
   const digits = f.phone.replace(/\D/g, "");
-  const uaeNumber = digits.startsWith("971")
-    ? digits.slice(3)
-    : digits.replace(/^0/, "");
-  if (!/^5\d{8}$/.test(uaeNumber)) return "Enter a valid UAE mobile number";
+  const uaeNumber = digits
+    .replace(/\D/g, "")
+    .replace(/^971/, "")
+    .replace(/^0/, "");
+
+  if (!/^5\d{8}$/.test(uaeNumber)) {
+    return "Enter a valid UAE mobile number";
+  }
 
   if (!f.address.trim()) return "Address is required";
   if (!f.city.trim()) return "City is required";

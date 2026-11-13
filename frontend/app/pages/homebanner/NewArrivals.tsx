@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { FiArrowRight, FiBox, FiHeart, FiShoppingBag } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiBox,
+  FiChevronLeft,
+  FiChevronRight,
+  FiHeart,
+  FiShoppingBag,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
 
 import { useGetcategoryQuery } from "@/store/categoriesApi";
@@ -158,16 +165,17 @@ const NewArrivals = () => {
     <section className="w-full bg-white py-5 dark:bg-[#111]">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
         {/* HEADER */}
-        <div className="mb-4 flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="shrink-0">
-            <h2 className="font-serif text-[18px] font-extrabold text-[#151515] sm:text-[22px] dark:text-white">
-              New Arrivals
-            </h2>
-            <p className="mt-1 text-xs text-gray-500">
-              Discover our latest products and exclusive deals
-            </p>
-          </div>
+        <div className="mb-4 min-w-0">
+          <h2 className="font-serif text-[18px] font-extrabold text-[#151515] sm:text-[22px] dark:text-white">
+            New Arrivals
+          </h2>
+          <p className="mt-1 text-xs text-gray-500">
+            Discover our latest products and exclusive deals
+          </p>
+        </div>
 
+        {/* CATEGORY SLIDER (own row, never overlaps the heading) */}
+        <div className="mb-4 min-w-0">
           <CategoryTabs
             tabs={tabs}
             active={activeTab}
@@ -208,7 +216,7 @@ const NewArrivals = () => {
 };
 
 /* -------------------------------------------------------------------------- */
-/*  Category tabs                                                             */
+/*  Category slider                                                           */
 /* -------------------------------------------------------------------------- */
 
 type CategoryTabsProps = {
@@ -217,24 +225,86 @@ type CategoryTabsProps = {
   onChange: (id: string) => void;
 };
 
-const CategoryTabs = ({ tabs, active, onChange }: CategoryTabsProps) => (
-  <div className="no-scrollbar flex min-w-0 items-center gap-2 overflow-x-auto pb-1 lg:justify-center lg:pb-0">
-    {tabs.map((tab) => (
+const SCROLL_STEP = 240;
+
+const CategoryTabs = ({ tabs, active, onChange }: CategoryTabsProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < maxScroll - 4);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    window.addEventListener("resize", updateScrollState);
+
+    return () => window.removeEventListener("resize", updateScrollState);
+  }, [tabs, updateScrollState]);
+
+  const scrollByStep = (direction: 1 | -1) => {
+    scrollRef.current?.scrollBy({
+      left: direction * SCROLL_STEP,
+      behavior: "smooth",
+    });
+  };
+
+  const arrowClass = (enabled: boolean) =>
+    `flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-black shadow-sm transition hover:border-[#ffd83d] hover:bg-[#fff7d5] disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-[#222] dark:text-white ${
+      enabled ? "" : "pointer-events-none"
+    }`;
+
+  return (
+    <div className="flex min-w-0 items-center gap-2">
       <button
-        key={tab.id}
         type="button"
-        onClick={() => onChange(tab.id)}
-        className={`shrink-0 cursor-pointer whitespace-nowrap rounded-full px-3.5 py-2 font-serif text-[10px] font-semibold tracking-wider transition-all duration-200 sm:px-4 sm:text-[11px] ${
-          active === tab.id
-            ? "bg-[#ffd51c] text-black"
-            : "bg-[#f5f5f5] text-black hover:bg-[#ececec] dark:bg-[#222] dark:text-gray-300"
-        }`}
+        onClick={() => scrollByStep(-1)}
+        disabled={!canScrollLeft}
+        aria-label="Scroll categories left"
+        className={arrowClass(canScrollLeft)}
       >
-        {tab.label}
+        <FiChevronLeft size={16} />
       </button>
-    ))}
-  </div>
-);
+
+      <div
+        ref={scrollRef}
+        onScroll={updateScrollState}
+        className="no-scrollbar flex min-w-0 flex-1 items-center gap-2 overflow-x-auto scroll-smooth py-1"
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onChange(tab.id)}
+            className={`shrink-0 cursor-pointer whitespace-nowrap rounded-full px-3.5 py-2 font-serif text-[10px] font-semibold tracking-wider transition-all duration-200 sm:px-4 sm:text-[11px] ${
+              active === tab.id
+                ? "bg-[#ffd51c] text-black"
+                : "bg-[#f5f5f5] text-black hover:bg-[#ececec] dark:bg-[#222] dark:text-gray-300"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => scrollByStep(1)}
+        disabled={!canScrollRight}
+        aria-label="Scroll categories right"
+        className={arrowClass(canScrollRight)}
+      >
+        <FiChevronRight size={16} />
+      </button>
+    </div>
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /*  Product card                                                              */
